@@ -242,10 +242,100 @@
         .resistance-symbol {
             animation: resistance-symbol 2s infinite;
         }
+
+        /* New button styles */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .secondary-btn {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            color: var(--resistance-light);
+            border: 2px solid var(--resistance-accent);
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        .secondary-btn:hover {
+            border-color: var(--resistance-red);
+            background: rgba(217, 4, 41, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn.training {
+            border-color: var(--resistance-red);
+            color: var(--resistance-red);
+        }
+
+        .secondary-btn.training:hover {
+            background: var(--resistance-red);
+            color: var(--resistance-light);
+        }
+
+        .disagree-btn {
+            background: rgba(237, 242, 244, 0.1);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            color: var(--resistance-accent);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .disagree-btn:hover {
+            background: rgba(217, 4, 41, 0.1);
+            color: var(--resistance-red);
+        }
+
+        .disagree-btn.show {
+            display: inline-block;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: rgba(237, 242, 244, 0.05);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat i {
+            color: var(--resistance-red);
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="nav-bar">
+            <a href="/train.html" class="secondary-btn training">
+                <i class="fas fa-graduation-cap"></i> Mode Entraînement
+            </a>
+        </div>
         <div class="resistance-header">
             <h1 class="title">Résistance Numérique</h1>
             <p class="subtitle">Analyseur de propagande et d'idéologie</p>
@@ -265,7 +355,27 @@
             Analyser
         </button>
         
-        <div id="result" class="result"></div>
+        <div class="result" id="result"></div>
+        
+        <div class="stats">
+            <div class="stat">
+                <i class="fas fa-check-circle"></i>
+                <span>Analyses: <span id="analysisCount">0</span></span>
+            </div>
+            <div class="stat">
+                <i class="fas fa-flag"></i>
+                <span>Désaccords: <span id="disagreeCount">0</span></span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="secondary-btn" id="clearBtn">
+                <i class="fas fa-trash"></i> Effacer
+            </button>
+            <button class="secondary-btn" id="historyBtn">
+                <i class="fas fa-history"></i> Historique
+            </button>
+        </div>
         
         <div class="resistance-footer">
             <p>"Ceux qui ne se souviennent pas du passé sont condamnés à le répéter" - George Santayana</p>
@@ -292,6 +402,11 @@
             "démocratie": "Système combattu par le régime nazi",
             "égalité": "Valeur fondamentale opposée à l'idéologie nazie"
         };
+
+        let analysisCount = 0;
+        let disagreeCount = 0;
+        const clearBtn = document.getElementById('clearBtn');
+        const historyBtn = document.getElementById('historyBtn');
 
         function showResult(text, percentage) {
             const quote = resistanceQuotes[Math.floor(Math.random() * resistanceQuotes.length)];
@@ -326,6 +441,25 @@
                     result.querySelector('.historical-context').style.display = 'block';
                 }
             }, 1000);
+
+            analysisCount++;
+            document.getElementById('analysisCount').textContent = analysisCount;
+
+            // Add disagree button to results
+            const disagreeBtn = document.createElement('button');
+            disagreeBtn.className = 'disagree-btn';
+            disagreeBtn.innerHTML = '<i class="fas fa-thumbs-down"></i> Je ne suis pas d\'accord';
+            disagreeBtn.onclick = function() {
+                disagreeCount++;
+                document.getElementById('disagreeCount').textContent = disagreeCount;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-check"></i> Désaccord enregistré';
+                this.style.opacity = '0.6';
+            };
+            
+            const resultDiv = document.querySelector('.result');
+            resultDiv.appendChild(disagreeBtn);
+            setTimeout(() => disagreeBtn.classList.add('show'), 1000);
         }
 
         // Add resistance symbols in background
@@ -431,6 +565,25 @@
 
         // Focus input on load
         wordInput.focus();
+
+        clearBtn.addEventListener('click', () => {
+            wordInput.value = '';
+            result.classList.remove('show');
+            result.innerHTML = '';
+        });
+
+        historyBtn.addEventListener('click', () => {
+            alert('Fonctionnalité à venir: Historique des analyses');
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement === wordInput) {
+                analyzeWord();
+            } else if (e.key === 'Escape') {
+                clearBtn.click();
+            }
+        });
     </script>
 </body>
 </html>
