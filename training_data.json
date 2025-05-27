@@ -1,0 +1,86 @@
+{
+  "propagande": {
+    "value": 69,
+    "confidence": 0.1,
+    "agreements": 1,
+    "total": 1
+  },
+  "mensonge": {
+    "value": 62,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  },
+  "paix": {
+    "value": -96,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  },
+  "censure": {
+    "value": 84,
+    "confidence": 0,
+    "agreements": 0,
+    "total": 2
+  },
+  "résistance": {
+    "value": -97,
+    "confidence": 0.1,
+    "agreements": 1,
+    "total": 1
+  },
+  "collaboration": {
+    "value": 99,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  },
+  "manipulation": {
+    "value": 64,
+    "confidence": 0.1,
+    "agreements": 1,
+    "total": 1
+  },
+  "discrimination": {
+    "value": 89,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  },
+  "tolérance": {
+    "value": -49,
+    "confidence": 0.1,
+    "agreements": 1,
+    "total": 1
+  },
+  "violence": {
+    "value": 47,
+    "confidence": 0.5,
+    "agreements": 1,
+    "total": 2
+  },
+  "vérité": {
+    "value": -70,
+    "confidence": 0,
+    "agreements": 0,
+    "total": 2
+  },
+  "liberté": {
+    "value": -80,
+    "confidence": 0.1,
+    "agreements": 1,
+    "total": 1
+  },
+  "égalité": {
+    "value": -51,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  },
+  "oppression": {
+    "value": 75,
+    "confidence": 0.1,
+    "agreements": 0,
+    "total": 1
+  }
+}
