@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Résistance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --resistance-red: #D90429;
+            --resistance-dark: #2B2D42;
+            --resistance-light: #EDF2F4;
+            --resistance-accent: #8D99AE;
+            --success: #4CAF50;
+            --warning: #FFC107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--resistance-dark);
+            color: var(--resistance-light);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1rem;
+        }
+
+        .game-container {
+            width: min(95%, 800px);
+            background-color: rgba(43, 45, 66, 0.95);
+            border: 2px solid var(--resistance-red);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            color: var(--resistance-red);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--resistance-accent);
+            margin-bottom: 1rem;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--resistance-red);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--resistance-accent);
+        }
+
+        .game-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .word-display {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .slider-container {
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #4CAF50, #FFC107, #D90429);
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--resistance-light);
+            cursor: pointer;
+            border: 2px solid var(--resistance-red);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            color: var(--resistance-accent);
+            font-size: 0.9rem;
+        }
+
+        .value-display {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            color: var(--resistance-light);
+        }
+
+        .submit-btn {
+            padding: 1rem 2rem;
+            background: var(--resistance-red);
+            color: var(--resistance-light);
+            border: none;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            background: #b1031f;
+            transform: translateY(-2px);
+        }
+
+        .result-area {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .flag-button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .flag-button:hover {
+            background: var(--warning);
+            color: var(--resistance-dark);
+        }
+
+        .flag-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .flag-modal-content {
+            background: var(--resistance-dark);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 2px solid var(--warning);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .flag-textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--resistance-accent);
+            border-radius: 4px;
+            color: var(--resistance-light);
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .training-indicator {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .training-indicator.ai {
+            background: var(--resistance-accent);
+            color: var(--resistance-dark);
+        }
+
+        .training-indicator.community {
+            background: var(--success);
+            color: var(--resistance-light);
+        }
+
+        .result-area.correct {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        .result-area.incorrect {
+            background: rgba(217, 4, 41, 0.2);
+            border: 1px solid var(--resistance-red);
+        }
+
+        .score-animation {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatUp 1.5s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--resistance-accent);
+            border: 1px solid var(--resistance-accent);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: var(--resistance-light);
+            border-color: var(--resistance-light);
+        }
+
+        .streak-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.2rem;
+            color: var(--warning);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--resistance-dark);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 2px solid var(--resistance-red);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 1.4rem;
+            }
+
+            .word-display {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="streak-indicator">
+            <i class="fas fa-fire"></i> <span id="streakCount">0</span>
+        </div>
+        
+        <div class="header">
+            <h1 class="title">Entraînement Résistance</h1>
+            <p class="subtitle">Évaluez la proximité avec l'idéologie nazie et comparez avec l'IA</p>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat">
+                <div class="stat-value" id="scoreValue">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracyValue">0%</div>
+                <div class="stat-label">Précision</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="wordsValue">0</div>
+                <div class="stat-label">Mots évalués</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="word-display" id="currentWord">Chargement...</div>
+            
+            <div class="slider-container">
+                <input type="range" min="-100" max="100" value="0" class="slider" id="evaluationSlider">
+                <div class="slider-labels">
+                    <span>Anti-fasciste (-100)</span>
+                    <span>Neutre (0)</span>
+                    <span>Nazi (100)</span>
+                </div>
+                <div class="value-display">
+                    Votre évaluation: <span id="sliderValue">0</span>%
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn">Évaluer</button>
+        </div>
+
+        <div class="result-area" id="resultArea"></div>
+
+        <div class="flag-modal" id="flagModal">
+            <div class="flag-modal-content">
+                <h3>Signaler cette évaluation</h3>
+                <p>Expliquez pourquoi vous pensez que cette évaluation est incorrecte :</p>
+                <textarea class="flag-textarea" id="flagReason" placeholder="Votre explication..."></textarea>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="submit-btn" onclick="submitFlag()">Envoyer</button>
+                    <button class="nav-btn" onclick="closeFlagModal()">Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> Retour à l'analyse
+            </button>
+            <button class="nav-btn" id="skipBtn">
+                Passer <i class="fas fa-forward"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="levelUpModal">
+        <div class="modal-content">
+            <h2>Niveau Supérieur! 🎉</h2>
+            <p>Vous avez atteint une série de <span id="modalStreak">X</span> bonnes réponses!</p>
+            <button class="submit-btn" onclick="closeModal()">Continuer</button>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            "liberté", "égalité", "fraternité", "démocratie", "dictature",
+            "paix", "guerre", "violence", "tolérance", "discrimination",
+            "droits", "oppression", "résistance", "collaboration", "justice",
+            "propagande", "censure", "vérité", "mensonge", "manipulation"
+        ];
+
+        let currentScore = 0;
+        let totalAttempts = 0;
+        let correctAttempts = 0;
+        let streak = 0;
+        let currentWord = "";
+
+        const slider = document.getElementById('evaluationSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const submitBtn = document.getElementById('submitBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const resultArea = document.getElementById('resultArea');
+        const streakCount = document.getElementById('streakCount');
+        const modal = document.getElementById('levelUpModal');
+
+        function updateStats() {
+            document.getElementById('scoreValue').textContent = currentScore;
+            document.getElementById('accuracyValue').textContent = 
+                totalAttempts ? Math.round((correctAttempts / totalAttempts) * 100) + '%' : '0%';
+            document.getElementById('wordsValue').textContent = totalAttempts;
+            streakCount.textContent = streak;
+        }
+
+        function showScoreAnimation(points, isCorrect) {
+            const animation = document.createElement('div');
+            animation.className = 'score-animation';
+            animation.style.color = isCorrect ? 'var(--success)' : 'var(--resistance-red)';
+            animation.textContent = isCorrect ? `+${points}` : `-${points}`;
+            animation.style.left = `${Math.random() * 80 + 10}%`;
+            document.body.appendChild(animation);
+            setTimeout(() => animation.remove(), 1500);
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function showLevelUpModal() {
+            document.getElementById('modalStreak').textContent = streak;
+            modal.style.display = 'flex';
+        }
+
+        slider.oninput = function() {
+            sliderValue.textContent = this.value;
+        }
+
+        async function evaluateWord() {
+            const userValue = parseInt(slider.value);
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ word: currentWord })
+                });
+
+                const data = await response.json();
+                const aiValue = parseFloat(data.analysis);
+                const isTrained = data.isTrained;
+
+                // Calculate difference and determine accuracy
+                const difference = Math.abs(userValue - aiValue);
+                const isAccurate = difference <= 20; // Within 20% margin
+
+                // Update stats
+                totalAttempts++;
+                if (isAccurate) {
+                    correctAttempts++;
+                    currentScore += 10;
+                    streak++;
+                    if (streak > 0 && streak % 5 === 0) {
+                        showLevelUpModal();
+                    }
+                } else {
+                    currentScore = Math.max(0, currentScore - 5);
+                    streak = 0;
+                }
+
+                // Submit training data
+                await fetch('/train-submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        word: currentWord,
+                        userValue,
+                        aiValue,
+                        isAccurate
+                    })
+                });
+
+                // Show result
+                resultArea.innerHTML = `
+                    <h3>
+                        ${isAccurate ? '✅ Bonne évaluation!' : '❌ Pas tout à fait...'}
+                        ${isTrained ? 
+                            '<span class="training-indicator community">Évaluation communautaire</span>' : 
+                            '<span class="training-indicator ai">Évaluation IA</span>'}
+                    </h3>
+                    <p>Votre évaluation: ${userValue}%</p>
+                    <p>Évaluation ${isTrained ? 'de la communauté' : 'de l\'IA'}: ${aiValue}%</p>
+                    <p>Différence: ${difference}%</p>
+                    <button class="flag-button" onclick="showFlagModal()">
+                        <i class="fas fa-flag"></i> Signaler cette évaluation
+                    </button>
+                `;
+                resultArea.className = `result-area ${isAccurate ? 'correct' : 'incorrect'}`;
+                resultArea.style.display = 'block';
+
+                showScoreAnimation(isAccurate ? 10 : 5, isAccurate);
+                updateStats();
+                
+                // Store current values for flagging
+                window.currentEvaluation = {
+                    word: currentWord,
+                    userValue,
+                    aiValue
+                };
+
+                // Get next word after a delay
+                setTimeout(getNewWord, 2000);
+
+            } catch (error) {
+                console.error('Error:', error);
+                resultArea.innerHTML = 'Erreur lors de l\'évaluation. Veuillez réessayer.';
+                resultArea.className = 'result-area incorrect';
+                resultArea.style.display = 'block';
+            }
+        }
+
+        function getNewWord() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('currentWord').textContent = currentWord;
+            slider.value = 0;
+            sliderValue.textContent = '0';
+            resultArea.style.display = 'none';
+        }
+
+        function showFlagModal() {
+            document.getElementById('flagModal').style.display = 'flex';
+        }
+
+        function closeFlagModal() {
+            document.getElementById('flagModal').style.display = 'none';
+            document.getElementById('flagReason').value = '';
+        }
+
+        async function submitFlag() {
+            const reason = document.getElementById('flagReason').value.trim();
+            if (!reason) {
+                alert('Veuillez expliquer pourquoi vous signalez cette évaluation.');
+                return;
+            }
+
+            try {
+                await fetch('/flag-response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...window.currentEvaluation,
+                        reason
+                    })
+                });
+
+                closeFlagModal();
+                alert('Merci pour votre signalement. Notre équipe va l\'examiner.');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Erreur lors de l\'envoi du signalement. Veuillez réessayer.');
+            }
+        }
+
+        submitBtn.addEventListener('click', evaluateWord);
+        skipBtn.addEventListener('click', getNewWord);
+
+        // Start the game
+        getNewWord();
+    </script>
+</body>
+</html> 

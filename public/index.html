@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résistance Numérique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --resistance-red: #D90429;
+            --resistance-dark: #2B2D42;
+            --resistance-light: #EDF2F4;
+            --resistance-accent: #8D99AE;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes resistance-fade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--resistance-dark);
+            color: var(--resistance-light);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .resistance-symbol {
+            position: fixed;
+            opacity: 0.1;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .container {
+            width: min(90%, 600px);
+            background-color: rgba(43, 45, 66, 0.95);
+            border: 2px solid var(--resistance-red);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(217, 4, 41, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resistance-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            color: var(--resistance-red);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .title::after {
+            content: "✊";
+            position: absolute;
+            right: -30px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .title:hover::after {
+            opacity: 1;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--resistance-accent);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: var(--resistance-dark);
+            border: 1px solid var(--resistance-accent);
+            border-radius: 4px;
+            color: var(--resistance-light);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--resistance-red);
+            box-shadow: 0 0 10px rgba(217, 4, 41, 0.3);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--resistance-red);
+            color: var(--resistance-light);
+            border: none;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analyze-btn:hover {
+            background: #b1031f;
+            transform: translateY(-2px);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            display: none;
+            padding: 1.5rem;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 1rem;
+            background: rgba(237, 242, 244, 0.05);
+            margin-bottom: 1.5rem;
+            animation: resistance-fade 0.5s ease-out;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .meter-container {
+            margin: 1rem 0;
+            height: 20px;
+            background: rgba(237, 242, 244, 0.1);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meter {
+            height: 100%;
+            transition: width 1s ease, background-color 1s;
+            position: relative;
+        }
+
+        .meter::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.1) 10px,
+                rgba(0,0,0,0.1) 20px
+            );
+        }
+
+        .resistance-quote {
+            font-style: italic;
+            color: var(--resistance-accent);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .historical-context {
+            font-size: 0.8rem;
+            color: var(--resistance-accent);
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .resistance-footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--resistance-accent);
+        }
+
+        .easter-egg {
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .container:hover .easter-egg {
+            opacity: 0.1;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Easter egg animations */
+        @keyframes resistance-symbol {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .resistance-symbol {
+            animation: resistance-symbol 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="resistance-header">
+            <h1 class="title">Résistance Numérique</h1>
+            <p class="subtitle">Analyseur de propagande et d'idéologie</p>
+        </div>
+        
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="wordInput" 
+                class="input-field" 
+                placeholder="Entrez un mot ou une expression à analyser..."
+                maxlength="100"
+            >
+        </div>
+        
+        <button id="analyzeBtn" class="analyze-btn">
+            Analyser
+        </button>
+        
+        <div id="result" class="result"></div>
+        
+        <div class="resistance-footer">
+            <p>"Ceux qui ne se souviennent pas du passé sont condamnés à le répéter" - George Santayana</p>
+        </div>
+    </div>
+
+    <script>
+        const wordInput = document.getElementById('wordInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const result = document.getElementById('result');
+
+        // Historical resistance quotes
+        const resistanceQuotes = [
+            "La liberté n'est pas donnée, elle se conquiert. - Résistance française",
+            "Ils pourront couper toutes les fleurs, ils n'empêcheront pas le printemps. - Pablo Neruda",
+            "La nuit la plus sombre prendra fin et le soleil se lèvera. - Victor Hugo",
+            "La résistance est le secret de la joie. - Alice Walker"
+        ];
+
+        // Historical contexts
+        const historicalContexts = {
+            "liberté": "Mot clé de la Résistance française (1940-1944)",
+            "résistance": "Mouvement de lutte contre l'oppression nazie",
+            "démocratie": "Système combattu par le régime nazi",
+            "égalité": "Valeur fondamentale opposée à l'idéologie nazie"
+        };
+
+        function showResult(text, percentage) {
+            const quote = resistanceQuotes[Math.floor(Math.random() * resistanceQuotes.length)];
+            const context = historicalContexts[wordInput.value.toLowerCase()] || '';
+            
+            let meterClass = '';
+            if (percentage > 70) meterClass = 'extreme-nazi';
+            else if (percentage > 40) meterClass = 'strong-nazi';
+            else if (percentage > 0) meterClass = 'slight-nazi';
+            else if (percentage < -70) meterClass = 'extreme-anti';
+            else if (percentage < -40) meterClass = 'strong-anti';
+            else meterClass = 'slight-anti';
+
+            const resultHtml = `
+                <div>
+                    <strong>${text}</strong>
+                    <div class="meter-container">
+                        <div class="meter ${meterClass}" style="width: ${Math.abs(percentage)}%; background-color: ${percentage > 0 ? '#D90429' : '#4dff4d'}"></div>
+                    </div>
+                    <div class="resistance-quote">${quote}</div>
+                    ${context ? `<div class="historical-context">${context}</div>` : ''}
+                </div>
+            `;
+            
+            result.innerHTML = resultHtml;
+            result.classList.add('show');
+            
+            // Show quote and context with delay
+            setTimeout(() => {
+                result.querySelector('.resistance-quote').style.display = 'block';
+                if (context) {
+                    result.querySelector('.historical-context').style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        // Add resistance symbols in background
+        function addResistanceSymbols() {
+            const symbols = ['✊', '☮', '✌', '❤'];
+            for (let i = 0; i < 20; i++) {
+                const symbol = document.createElement('div');
+                symbol.className = 'resistance-symbol';
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                symbol.style.fontSize = `${Math.random() * 20 + 10}px`;
+                document.body.appendChild(symbol);
+            }
+        }
+
+        addResistanceSymbols();
+
+        async function analyzeWord() {
+            const word = wordInput.value.trim();
+            
+            if (!word) {
+                showResult('Veuillez entrer un mot ou une expression', 0);
+                return;
+            }
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse...';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ word })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de l\'analyse');
+                }
+
+                const percentage = parseFloat(data.analysis);
+                
+                if (!isNaN(percentage)) {
+                    let message;
+                    if (percentage > 70) {
+                        message = `Attention: "${word}" présente une très forte association avec l'idéologie nazie`;
+                    } else if (percentage > 40) {
+                        message = `"${word}" montre une association significative avec l'idéologie nazie`;
+                    } else if (percentage > 0) {
+                        message = `"${word}" présente quelques éléments d'association avec l'idéologie nazie`;
+                    } else if (percentage < -70) {
+                        message = `"${word}" représente une forte opposition à l'idéologie nazie`;
+                    } else if (percentage < -40) {
+                        message = `"${word}" s'oppose à l'idéologie nazie`;
+                    } else if (percentage < 0) {
+                        message = `"${word}" montre une légère opposition à l'idéologie nazie`;
+                    } else {
+                        message = `"${word}" est neutre vis-à-vis de l'idéologie nazie`;
+                    }
+                    
+                    showResult(message, percentage);
+                } else {
+                    showResult('Résultat indéterminé', 0);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('Erreur lors de l\'analyse. Veuillez réessayer.', 0);
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = 'Analyser';
+            }
+        }
+
+        analyzeBtn.addEventListener('click', analyzeWord);
+        
+        wordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                analyzeWord();
+            }
+        });
+
+        // Easter egg: Konami code
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    document.body.style.background = 'linear-gradient(45deg, #D90429, #2B2D42)';
+                    alert('Code de résistance activé! ✊');
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        // Focus input on load
+        wordInput.focus();
+    </script>
+</body>
+</html>
